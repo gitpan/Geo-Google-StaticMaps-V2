@@ -1,0 +1,18 @@
+Revision history for Perl module Geo::Google::StaticMaps::V2
+
+0.05 2013-06-12
+  - Added Google Maps API Signature capability
+
+0.04 2013-06-10
+  - Fixed Makefile.PL requires
+  - Added RPM spec file
+  - Added t/006_save.t
+
+0.03 2013-06-09
+  - Path method and object are now fully operational
+
+0.02 2013-06-09
+  - Marker method and object are now fully operational
+
+0.01 2013-06-09
+  - original version; created by ExtUtils::ModuleMaker 0.51

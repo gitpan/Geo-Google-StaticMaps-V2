@@ -1,0 +1,18 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Geo/Google/StaticMaps/V2.pm
+lib/Geo/Google/StaticMaps/V2/Base.pm
+lib/Geo/Google/StaticMaps/V2/Path.pm
+lib/Geo/Google/StaticMaps/V2/Markers.pm
+t/001_load.t
+t/002_url.t
+t/003_markers.t
+t/004_paths.t
+t/005_paths_geodesic.t
+t/006_save.t
+perl-Geo-Google-StaticMaps-V2.spec
+META.yml                                 Module meta-data (added by MakeMaker)
