@@ -1,23 +1,24 @@
 package Geo::Google::StaticMaps::V2::Path;
 use warnings;
 use strict;
-use base qw{Geo::Google::StaticMaps::V2::Base};
-our $VERSION = '0.03';
+use base qw{Geo::Google::StaticMaps::V2::Visible};
+our $VERSION = '0.08';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
 
-Geo::Google::StaticMaps::V2::Path - Generate Images from Google Static Maps API V2 API
+Geo::Google::StaticMaps::V2::Path - Generate Images from Google Static Maps V2 API
 
 =head1 SYNOPSIS
 
   use Geo::Google::StaticMaps::V2;
   my $map=Geo::Google::StaticMaps::V2->new;
-  my $marker=$map->marker(lacation=>[$lat=>$lon]); #isa Geo::Google::StaticMaps::V2::Path
+  my $path=$map->path(locations=>["Clifton, VA", "Pag, Croatia"], geodesic=>1); #isa Geo::Google::StaticMaps::V2::Path
+  print $map->url, "\n";
 
 =head1 DESCRIPTION
 
-The packages generates images from the Google Static Maps API V2 API which can be saved locally for use in accordance with your license with Google.
+The packages generates images from the Google Static Maps V2 API which can be saved locally for use in accordance with your license with Google.
 
 =head1 USAGE
 
@@ -53,17 +54,57 @@ color: (optional) specifies a color either as a 24-bit (example: color=0xFFFFCC)
 
 When a 32-bit hex value is specified, the last two characters specify the 8-bit alpha transparency value. This value varies between 00 (completely transparent) and FF (completely opaque). Note that transparencies are supported in paths, though they are not supported for markers.
 
+  my $color=$path->color("blue");
+  my $color=$path->color("0xFFFFCC");
+  my $color=$path->color({r=>255,g=>0,b=>0,a=>64}); #maps to red   25% returns 0xFF000040
+  my $color=$path->color([0,255,0,"75%"]);          #maps to green 75% returns 0x00FF00C0
+
+=cut
+
+sub _color {
+  my $self=shift;
+  my $key=shift; #color||fillcolor
+  $self->{$key}=shift if @_;
+  if (ref($self->{$key})) {
+    my $r;
+    my $g;
+    my $b;
+    my $a;
+    if (ref($self->{$key}) eq "HASH") {
+      $r = $self->{$key}->{"r"} || 0;
+      $g = $self->{$key}->{"g"} || 0;
+      $b = $self->{$key}->{"b"} || 0;
+      $a = $self->{$key}->{"a"};
+    } elsif (ref($self->{$key}) eq "ARRAY") {
+      $r = $self->{$key}->[0]   || 0;
+      $g = $self->{$key}->[1]   || 0;
+      $b = $self->{$key}->[2]   || 0;
+      $a = $self->{$key}->[3];
+    } else {
+      die("Error: Unknown reference type expecting HASH or ARRAY.");
+    }
+    if (defined $a) {
+      if ($a =~ m/^(100|\d\d|\d)\%$/) {
+        $a=int($1/100*255);
+      }
+      return sprintf("0x%02X%02X%02X%02X", $r, $g, $b, $a);
+    } else {
+      return sprintf("0x%02X%02X%02X", $r, $g, $b);
+    }
+  } else {
+    return $self->{$key};
+  }
+}
+
+sub color {shift->_color(color=>@_)};
+
 =head2 fillcolor
 
 fillcolor: (optional) indicates both that the path marks off a polygonal area and specifies the fill color to use as an overlay within that area. The set of locations following need not be a "closed" loop; the Static Map server will automatically join the first and last points. Note, however, that any stroke on the exterior of the filled area will not be closed unless you specifically provide the same beginning and end location. 
 
 =cut
 
-sub fillcolor {
-  my $self=shift;
-  $self->{"fillcolor"}=shift if @_;
-  return $self->{"fillcolor"};
-}
+sub fillcolor {shift->_color(fillcolor=>@_)};
 
 =head2 geodesic
 
@@ -85,7 +126,11 @@ sub geodesic {
 
 =head1 BUGS
 
+Please log on RT and send an email to the author.
+
 =head1 SUPPORT
+
+DavisNetworks.com supports all Perl applications including this package.
 
 =head1 AUTHOR
 
@@ -105,7 +150,7 @@ The full text of the license can be found in the LICENSE file included with this
 
 =head1 SEE ALSO
 
-L<Geo::Google::StaticMaps>, L<Geo::Google::MapObject>, L<Net::Flickr::Geo::GoogleMaps>
+L<Geo::Google::StaticMaps::V2>, L<Geo::Google::StaticMaps::V2::Base>
 
 =cut
 

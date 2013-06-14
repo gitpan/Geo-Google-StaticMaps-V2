@@ -1,23 +1,23 @@
 package Geo::Google::StaticMaps::V2::Markers;
 use warnings;
 use strict;
-use base qw{Geo::Google::StaticMaps::V2::Base};
-our $VERSION = '0.03';
+use base qw{Geo::Google::StaticMaps::V2::Visible};
+our $VERSION = '0.08';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
 
-Geo::Google::StaticMaps::V2::Markers - Generate Images from Google Static Maps API V2 API
+Geo::Google::StaticMaps::V2::Markers - Generate Images from Google Static Maps V2 API
 
 =head1 SYNOPSIS
 
   use Geo::Google::StaticMaps::V2;
   my $map=Geo::Google::StaticMaps::V2->new;
-  my $marker=$map->marker(lacation=>[$lat=>$lon]); #isa Geo::Google::StaticMaps::V2::Markers
+  my $marker=$map->marker(location=>[$lat=>$lon]); #isa Geo::Google::StaticMaps::V2::Markers
 
 =head1 DESCRIPTION
 
-The packages generates images from the Google Static Maps API V2 API which can be saved locally for use in accordance with your license with Google.
+The packages generates images from the Google Static Maps V2 API which can be saved locally for use in accordance with your license with Google.
 
 =head1 USAGE
 
@@ -50,7 +50,40 @@ sub size {
 
 =head2 color
 
+Set and returns a formatted marker color code.
+
 color: (optional) specifies a 24-bit color (example: color=0xFFFFCC) or a predefined color from the set {black, brown, green, purple, yellow, blue, gray, orange, red, white}.
+
+  my $color=$marker->color("blue");
+  my $color=$marker->color("0xFFFFCC");
+  my $color=$marker->color({r=>255,g=>0,b=>0}); #maps to red
+  my $color=$marker->color([255,0,0]);          #maps to red
+
+=cut
+
+sub color {
+  my $self=shift;
+  $self->{"color"}=shift if @_;
+  if (ref($self->{"color"})) {
+    my $r;
+    my $g;
+    my $b;
+    if (ref($self->{"color"}) eq "HASH") {
+      $r = $self->{"color"}->{"r"} || 0;
+      $g = $self->{"color"}->{"g"} || 0;
+      $b = $self->{"color"}->{"b"} || 0;
+    } elsif (ref($self->{"color"}) eq "ARRAY") {
+      $r = $self->{"color"}->[0]   || 0;
+      $g = $self->{"color"}->[1]   || 0;
+      $b = $self->{"color"}->[2]   || 0;
+    } else {
+      die("Error: Unknown reference type expecting HASH or ARRAY.");
+    }
+    return sprintf("0x%02X%02X%02X", $r, $g, $b);
+  } else {
+    return $self->{"color"};
+  }
+}
 
 =head2 label
 
@@ -100,7 +133,11 @@ sub shadow {
 
 =head1 BUGS
 
+Please log on RT and send an email to the author.
+
 =head1 SUPPORT
+
+DavisNetworks.com supports all Perl applications including this package.
 
 =head1 AUTHOR
 
@@ -120,7 +157,7 @@ The full text of the license can be found in the LICENSE file included with this
 
 =head1 SEE ALSO
 
-L<Geo::Google::StaticMaps>, L<Geo::Google::MapObject>, L<Net::Flickr::Geo::GoogleMaps>
+L<Geo::Google::StaticMaps::V2>, L<Geo::Google::StaticMaps::V2::Base>
 
 =cut
 

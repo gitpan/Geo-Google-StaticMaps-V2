@@ -2,18 +2,19 @@ package Geo::Google::StaticMaps::V2;
 use warnings;
 use strict;
 use base qw{Package::New};
+use File::Basename qw{};
 use Path::Class qw{file};
 use URI qw{};
 use LWP::UserAgent qw{};
 use Geo::Google::StaticMaps::V2::Markers;
 use Geo::Google::StaticMaps::V2::Path;
 
-our $VERSION = '0.05';
+our $VERSION = '0.08';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
 
-Geo::Google::StaticMaps::V2 - Generate Images from Google Static Maps API V2 API
+Geo::Google::StaticMaps::V2 - Generate Images from Google Static Maps V2 API
 
 =head1 SYNOPSIS
 
@@ -25,7 +26,7 @@ Geo::Google::StaticMaps::V2 - Generate Images from Google Static Maps API V2 API
 
 =head1 DESCRIPTION
 
-The packages generates images from the Google Static Maps API V2 API which can be saved locally for use in accordance with your license with Google.
+The packages generates images from the Google Static Maps V2 API which can be saved locally for use in accordance with your license with Google.
 
 =head1 USAGE
 
@@ -50,20 +51,25 @@ Any property can be specified on construction but all have sane defaults and are
 
 =head2 marker
 
-Creates a L<Geo::Google::StaticMaps::V2::Markers> object. Adds the object to the internal Markers array.  And adds a first location.
+Creates a L<Geo::Google::StaticMaps::V2::Markers> object and dds the object to the internal Markers array.
 
   $map->marker(location=>"7140 Main Street, Clifton, Virginia 20124");
-  $map->marker(location=>[38.780676,-77.387105]);
-  $map->marker(location=>"38.780676,-77.387105);
   $map->marker(location=>{lat=>38.780676,lon=>-77.387105});
+  $map->marker(location=>[38.780676,-77.387105]);
+  $map->marker(location=>"38.780676,-77.387105");
 
-Example
+markers (optional) define one or more markers to attach to the image at specified locations. Multiple markers may be placed within the same markers parameter as long as they exhibit the same style; you may add additional markers of differing styles by adding additional markers parameters. Note that if you supply markers for a map, you do not need to specify the (normally required) center and zoom parameters.
+
+Examples
 
   my $marker1=$map->marker(location=>{lat=>38.780676,lon=>-77.387105}); #isa L<Geo::Google::StaticMaps::V2::Markers>
-  $marker1->addLocation([38.780513,-77.387128]);                        #second point shares style
+  $marker1->addLocation([38.780513,-77.387128]);                        #second point shares style with first point
 
-  my $marker2=$map->marker(location=>{lat=>38.780596,lon=>-77.386837}); #third point different style
-  $marker2->size("tiny");                                               #third point is now tiny
+  my $marker2=$map->marker(locations=>[
+                                       {lat=>38.780596,lon=>-77.386837},
+                                       [38.780346,-77.386923]
+                                      ]);                               #third and forth points with different style
+  $marker2->size("tiny");                                               #third and forth points are now tiny
   $marker1->color("blue");                                              #first and second point are now blue
 
 =cut
@@ -89,7 +95,9 @@ sub _markers {
 
 =head2 path
 
-Creates a L<Geo::Google::StaticMaps::V2::Path> object.  Adds the object to the internal Paths array.
+Creates a L<Geo::Google::StaticMaps::V2::Path> object and adds the object to the internal Paths array.
+
+path (optional) defines a single path of two or more connected points to overlay on the image at specified locations. Note that if you supply a path for a map, you do not need to specify the (normally required) center and zoom parameters.
 
 =cut
 
@@ -112,6 +120,32 @@ sub _paths {
   return $self->{"_paths"};
 }
 
+=head2 visible
+
+Creates a L<Geo::Google::StaticMaps::V2::Visible> object and adds the object to the internal Visibles array.
+
+visible (optional) specifies one or more locations that should remain visible on the map, though no markers or other indicators will be displayed. Use this parameter to ensure that certain features or map locations are shown on the static map.
+
+=cut
+
+sub visible {
+  my $self=shift;
+  my $obj=Geo::Google::StaticMaps::V2::Visible->new(@_);
+  push @{$self->_visibles}, $obj;
+  return $obj;
+}
+
+#head2 _visibles
+#
+#Returns an array reference with the current list of visible objects.
+#
+##cut
+
+sub _visibles {
+  my $self=shift;
+  $self->{"_visibles"}//=[];
+  return $self->{"_visibles"};
+}
 
 =head1 PROPERTIES
 
@@ -195,7 +229,7 @@ sub sensor {
 
 scale (optional) affects the number of pixels that are returned. scale=2 returns twice as many pixels as scale=1 while retaining the same coverage area and level of detail (i.e. the contents of the map don't change). This is useful when developing for high-resolution displays, or when generating a map for printing. The default value is 1. Accepted values are 2 and 4 (4 is only available to Maps API for Business customers.) See Scale Values for more information. 
 
-  $map->scale; #undef (default is 1; not passed), 1, 2, 4
+  $map->scale; #undef (default is 1; not passed on URL), 1, 2, 4
 
 =cut
 
@@ -302,6 +336,8 @@ sub _service {
 
 Returns the image as a binary scalar.
 
+  my $blob=$map->image;
+
 See: L<LWP::UserAgent>
 
 =cut
@@ -334,22 +370,37 @@ sub _ua {
 
 =head2 save
 
-Downloads and saves image
+Saves image to the local file system.
+
+  $map->save("image.png");
+  $map->save("image.gif");
+  $map->save("image.jpg");
+
+Note: If you have not explicitly set the format, the save method will guess the format from the extension.
 
 =cut
 
 sub save {
-  my $self=shift;
-  my $filename=shift;
+  my $self     = shift;
+  my $filename = shift;
+  my $suffix   = (File::Basename::fileparse($filename, keys(%{$self->_extensions})))[2];
+  local $self->{"format"}=$self->_extensions->{$suffix}
+    if (exists($self->_extensions->{$suffix}) && !defined($self->format));
   my $file=file($filename); #isa Path::Class::File
   my $fh=$file->openw;
   print $fh $self->image;
   return $self;
 }
 
+sub _extensions {
+  return {".png" => undef, ".gif" => "gif", ".jpg" => "jpg"};
+}
+
 =head2 url
 
-  my $url=$map->url; #returns a L<URI> object
+Returns the URL for the Static map.  If L<URL::Signature::Google::Maps::API> is installed and configured the URL is seamlessly signed with your Google Enterprise Key.
+
+  my $url=$map->url; #isa L<URI>
 
 =cut
 
@@ -363,6 +414,10 @@ sub url {
   push @q, format  => $self->format  if defined $self->format;
   push @q, sensor  => $self->sensor ? "true" : "false";
   my $needs_view=1;
+  foreach my $visible (@{$self->_visibles}) {
+    $needs_view=0;
+    push @q, visible  => $visible->stringify;
+  }
   foreach my $marker (@{$self->_markers}) {
     $needs_view=0;
     push @q, markers => $marker->stringify;
@@ -468,7 +523,11 @@ sub channel {
 
 =head1 BUGS
 
+Please log on RT and send an email to the author.
+
 =head1 SUPPORT
+
+DavisNetworks.com supports all Perl applications including this package.
 
 =head1 AUTHOR
 

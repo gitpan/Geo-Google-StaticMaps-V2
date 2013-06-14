@@ -1,15 +1,13 @@
-pod2text Geo::Google::StaticMaps::V2.pm > README
+Install for RPM-based systems
 
-If this is still here it means the programmer was too lazy to create the readme file.
+  $ rpmbuild -ta XXX.tar.gz
+  # rpm -Uhv XXX.rpm
 
-You can create it now by using the command shown above from this directory.
+Or old school
 
-At the very least you should be able to use this set of instructions
-to install the module...
-
-perl Makefile.PL
-make
-make test
-make install
+  $ perl Makefile.PL
+  $ make
+  $ make test
+  # make install
 
 If you are on a windows box you should use 'nmake' rather than 'make'.

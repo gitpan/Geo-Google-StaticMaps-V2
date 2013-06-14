@@ -1,28 +1,29 @@
-package Geo::Google::StaticMaps::V2::Base;
+package Geo::Google::StaticMaps::V2::Visible;
 use warnings;
 use strict;
 use base qw{Package::New};
-our $VERSION = '0.03';
+our $VERSION = '0.07';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
 
-Geo::Google::StaticMaps::V2::Base - Generate Images from Google Static Maps API V2 API
+Geo::Google::StaticMaps::V2::Visible - Generate Images from Google Static Maps V2 API
 
 =head1 SYNOPSIS
 
-  use Geo::Google::StaticMaps::V2;
-  my $map=Geo::Google::StaticMaps::V2->new;
-  my $marker=$map->marker(lacation=>[$lat=>$lon]); #isa Geo::Google::StaticMaps::V2::Base
+  use base qw{Geo::Google::StaticMaps::V2::Visible};
 
 =head1 DESCRIPTION
 
-The packages generates images from the Google Static Maps API V2 API which can be saved locally for use in accordance with your license with Google.
+The packages generates images from the Google Static Maps V2 API which can be saved locally for use in accordance with your license with Google.
 
 =head1 USAGE
 
+  use base qw{Geo::Google::StaticMaps::V2::Visible};
 
 =head2 initialize
+
+Sets all passed in arguments and folds location parameter into the locations array.
 
 =cut
 
@@ -33,6 +34,8 @@ sub initialize {
 }
 
 =head2 stringify
+
+Handles various formats for locations seamlessly.
 
 =cut
 
@@ -66,18 +69,10 @@ sub locations {
   return wantarray ? @{$self->{"locations"}} : $self->{"locations"};
 }
 
-=head1 PROPERTIES
-
-=head2 color
-
-color: (optional) specifies a 24-bit color (example: color=0xFFFFCC) or a predefined color from the set {black, brown, green, purple, yellow, blue, gray, orange, red, white}.
-
-=cut
-
-sub color {
+sub _styles {
   my $self=shift;
-  $self->{"color"}=shift if @_;
-  return $self->{"color"};
+  my @styles=();
+  return @styles;
 }
 
 =head1 METHODS
@@ -96,7 +91,11 @@ sub addLocation {
 
 =head1 BUGS
 
+Please log on RT and send an email to the author.
+
 =head1 SUPPORT
+
+DavisNetworks.com supports all Perl applications including this package.
 
 =head1 AUTHOR
 
@@ -116,7 +115,7 @@ The full text of the license can be found in the LICENSE file included with this
 
 =head1 SEE ALSO
 
-L<Geo::Google::StaticMaps>, L<Geo::Google::MapObject>, L<Net::Flickr::Geo::GoogleMaps>
+L<Geo::Google::StaticMaps::V2>, L<Geo::Google::StaticMaps::V2::Path>, L<Geo::Google::StaticMaps::V2::Markers>
 
 =cut
 

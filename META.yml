@@ -1,7 +1,7 @@
 --- #YAML:1.0
 name:                Geo-Google-StaticMaps-V2
-version:             0.05
-abstract:            Generate Images from Google Static Maps API V2 API
+version:             0.08
+abstract:            Generate Images from Google Static Maps V2 API
 license:             ~
 author:              
     - Michael R. Davis (mdavis@stopllc.com)

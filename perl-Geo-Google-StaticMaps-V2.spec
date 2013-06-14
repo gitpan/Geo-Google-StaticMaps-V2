@@ -1,8 +1,8 @@
 Name:           perl-Geo-Google-StaticMaps-V2
-Version:        0.05
+Version:        0.08
 Release:        1%{?dist}
 Summary:        Generate Images from Google Static Maps API V2 API
-License:        Distributable, see LICENSE
+License:        GPLv2
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/Geo-Google-StaticMaps-V2/
 Source0:        http://www.cpan.org/modules/by-module/Geo/Geo-Google-StaticMaps-V2-%{version}.tar.gz
