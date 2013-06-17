@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Geo-Google-StaticMaps-V2
-version:             0.08
+version:             0.09
 abstract:            Generate Images from Google Static Maps V2 API
 license:             ~
 author:              
@@ -8,7 +8,7 @@ author:
 generated_by:        ExtUtils::MakeMaker version 6.42
 distribution_type:   module
 requires:     
-    LWP::UserAgent:                0
+    LWP:                           0
     Package::New:                  0
     Path::Class:                   0
     Test::Simple:                  0.44

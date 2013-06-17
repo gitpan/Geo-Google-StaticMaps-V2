@@ -157,7 +157,7 @@ The full text of the license can be found in the LICENSE file included with this
 
 =head1 SEE ALSO
 
-L<Geo::Google::StaticMaps::V2>, L<Geo::Google::StaticMaps::V2::Base>
+L<Geo::Google::StaticMaps::V2>
 
 =cut
 

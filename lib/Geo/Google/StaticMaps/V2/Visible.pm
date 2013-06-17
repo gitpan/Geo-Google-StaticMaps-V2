@@ -11,7 +11,10 @@ Geo::Google::StaticMaps::V2::Visible - Generate Images from Google Static Maps V
 
 =head1 SYNOPSIS
 
-  use base qw{Geo::Google::StaticMaps::V2::Visible};
+  use Geo::Google::StaticMaps::V2;
+  my $map=Geo::Google::StaticMaps::V2->new;
+  my $visible=$map->visible(locations=>["Clifton, VA", "Pag, Croatia"]); #isa Geo::Google::StaticMaps::V2::Visible
+  print $map->url, "\n";
 
 =head1 DESCRIPTION
 
@@ -19,7 +22,9 @@ The packages generates images from the Google Static Maps V2 API which can be sa
 
 =head1 USAGE
 
-  use base qw{Geo::Google::StaticMaps::V2::Visible};
+  use Geo::Google::StaticMaps::V2;
+  my $map=Geo::Google::StaticMaps::V2->new;
+  my $visible=$map->visible(location=>"Clifton, VA"); #isa Geo::Google::StaticMaps::V2::Visible
 
 =head2 initialize
 

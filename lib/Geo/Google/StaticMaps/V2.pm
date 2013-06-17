@@ -9,7 +9,7 @@ use LWP::UserAgent qw{};
 use Geo::Google::StaticMaps::V2::Markers;
 use Geo::Google::StaticMaps::V2::Path;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
@@ -51,7 +51,7 @@ Any property can be specified on construction but all have sane defaults and are
 
 =head2 marker
 
-Creates a L<Geo::Google::StaticMaps::V2::Markers> object and dds the object to the internal Markers array.
+Creates a L<Geo::Google::StaticMaps::V2::Markers> object and adds the object to the internal Markers array.
 
   $map->marker(location=>"7140 Main Street, Clifton, Virginia 20124");
   $map->marker(location=>{lat=>38.780676,lon=>-77.387105});
@@ -89,7 +89,7 @@ sub marker {
 
 sub _markers {
   my $self=shift;
-  $self->{"_markers"}//=[];
+  $self->{"_markers"}=[] unless ref($self->{"_markers"}) eq "ARRAY";
   return $self->{"_markers"};
 }
 
@@ -116,7 +116,7 @@ sub path {
 
 sub _paths {
   my $self=shift;
-  $self->{"_paths"}//=[];
+  $self->{"_paths"}=[] unless ref($self->{"_paths"}) eq "ARRAY";
   return $self->{"_paths"};
 }
 
@@ -143,7 +143,7 @@ sub visible {
 
 sub _visibles {
   my $self=shift;
-  $self->{"_visibles"}//=[];
+  $self->{"_visibles"}=[] unless ref($self->{"_visibles"}) eq "ARRAY";
   return $self->{"_visibles"};
 }
 
@@ -186,7 +186,7 @@ Note: width of image is actually width times scale
 sub width {
   my $self=shift;
   $self->{"width"}=shift if @_;
-  $self->{"width"}//=600;
+  $self->{"width"}||=600;
   return $self->{"width"};
 }
 
@@ -203,7 +203,7 @@ Note: height of image is actually height times scale
 sub height {
   my $self=shift;
   $self->{"height"}=shift if @_;
-  $self->{"height"}//=400;
+  $self->{"height"}||=400;
   return $self->{"height"};
 }
 
@@ -221,7 +221,7 @@ sensor (required) specifies whether the application requesting the static map is
 sub sensor {
   my $self=shift;
   $self->{"sensor"}=shift if @_;
-  $self->{"sensor"}//=0;
+  $self->{"sensor"}||=0;
   return $self->{"sensor"};
 }
 
@@ -278,7 +278,7 @@ Sets or returns the Google Maps API server
 sub server {
   my $self=shift;
   $self->{"server"}=shift if @_;
-  $self->{"server"}//="maps.googleapis.com";
+  $self->{"server"}="maps.googleapis.com" unless defined($self->{"server"});
   return $self->{"server"};
 }
 
@@ -293,7 +293,7 @@ Sets or returns the script for the Google Maps API Static Map
 sub script {
   my $self=shift;
   $self->{"script"}=shift if @_;
-  $self->{"script"}//="/maps/api/staticmap";
+  $self->{"script"}="/maps/api/staticmap" unless defined($self->{"script"});
   return $self->{"script"};
 }
 
@@ -309,7 +309,7 @@ Sets or returns the protocol
 sub protocol {
   my $self=shift;
   $self->{"protocol"}=shift if @_;
-  $self->{"protocol"}//="http";
+  $self->{"protocol"}="http" unless defined($self->{"protocol"});
   return $self->{"protocol"};
 }
 
@@ -473,7 +473,8 @@ sub _signer {
     if ($@) {
       $self->{"_signer"}="";
     } else {
-      $self->{"_signer"}//=URL::Signature::Google::Maps::API->new(channel=>$self->channel, client=>$self->client, key=>$self->key);
+      $self->{"_signer"}=URL::Signature::Google::Maps::API->new(channel=>$self->channel, client=>$self->client, key=>$self->key)
+        unless defined($self->{"_signer"});
     }
   }
   return $self->{"_signer"};
@@ -481,9 +482,9 @@ sub _signer {
 
 =head1 Google Enterprise Credentials
 
-This settings are simply passed through to L<URL::Signature::Google::Maps::API>.
+These settings are simply passed through to L<URL::Signature::Google::Maps::API>.
 
-I recommend storing the credentials in an INI formatted file and leaving these values as undef.
+I recommend storing the credentials in the INI formatted file and leaving these values as undef.
 
 =head2 client
 

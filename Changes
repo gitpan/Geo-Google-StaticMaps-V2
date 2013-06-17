@@ -1,5 +1,11 @@
 Revision history for Perl module Geo::Google::StaticMaps::V2
 
+0.09 2013-06-16
+  - Updated packages to support Perl < 5.10
+
+0.08-2 2013-06-13
+  - Updated Documentation
+
 0.08 2013-06-13
   - Updated path->color, path->fillcolor, and marker->color methods
     - Added color format support [$r,$g,$b],
